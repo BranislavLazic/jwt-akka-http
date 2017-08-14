@@ -105,10 +105,9 @@ final class HttpApi(host: String, port: Int) extends Actor with ActorLogging {
   import HttpApi._
   import context.dispatcher
 
-  private implicit val system       = context.system
   private implicit val materializer = ActorMaterializer()
 
-  Http().bindAndHandle(routes, host, port).pipeTo(self)
+  Http(context.system).bindAndHandle(routes, host, port).pipeTo(self)
 
   override def receive: Receive = {
     case ServerBinding(address) =>
