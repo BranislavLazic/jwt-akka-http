@@ -1,6 +1,7 @@
-# jwt-akka-http #
+# JWT Akka HTTP
 
-Welcome to jwt-akka-http!
+Source code from [blog post](https://blog.codecentric.de/en/2017/09/jwt-authentication-akka-http).
+Demonstrates basic implementation of JWT authentication with Akka HTTP.
 
 ## Contribution policy ##
 
