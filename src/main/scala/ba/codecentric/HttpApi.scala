@@ -48,53 +48,47 @@ object HttpApi {
   private val secretKey               = "super_secret_key"
   private val header                  = JwtHeader("HS256")
 
-  private def login = post {
+  private def login: Route = post {
     entity(as[LoginRequest]) {
       case lr @ LoginRequest("admin", "admin") =>
         val claims = setClaims(lr.username, tokenExpiryPeriodInDays)
-        respondWithHeader(RawHeader("Access-Token", JsonWebToken(header, claims, secretKey))) {
+        respondWithHeader(RawHeader("X-Access-Token", JsonWebToken(header, claims, secretKey))) {
           complete(StatusCodes.OK)
         }
       case LoginRequest(_, _) => complete(StatusCodes.Unauthorized)
     }
   }
 
-  private def securedContent = get {
+  private def securedContent: Route = get {
     authenticated { claims =>
-      complete(s"User ${claims.getOrElse("user", "")} accessed secured content!")
+      complete(s"User: ${claims.getOrElse("user", "")} has accessed a secured content!")
     }
   }
 
   private def authenticated: Directive1[Map[String, Any]] =
     optionalHeaderValueByName("Authorization").flatMap {
       case Some(jwt) if isTokenExpired(jwt) =>
-        complete(StatusCodes.Unauthorized -> "Token expired.")
+        complete(StatusCodes.Unauthorized -> "Session expired.")
 
       case Some(jwt) if JsonWebToken.validate(jwt, secretKey) =>
-        provide(getClaims(jwt).getOrElse(Map.empty[String, Any]))
+        provide(getClaims(jwt))
 
       case _ => complete(StatusCodes.Unauthorized)
     }
 
-  private def setClaims(username: String, expiryPeriodInDays: Long) = JwtClaimsSet(
-    Map("user" -> username,
-        "expiredAt" -> (System.currentTimeMillis() + TimeUnit.DAYS
-          .toMillis(expiryPeriodInDays)))
-  )
+  private def setClaims(username: String, expiryPeriodInDays: Long): JwtClaimsSetMap =
+    JwtClaimsSet(
+      Map("user" -> username,
+          "expiredAt" -> (System.currentTimeMillis() + TimeUnit.DAYS
+            .toMillis(expiryPeriodInDays)))
+    )
 
-  private def getClaims(jwt: String) = jwt match {
-    case JsonWebToken(_, claims, _) => claims.asSimpleMap.toOption
-    case _                          => None
+  private def getClaims(jwt: String): Map[String, String] = jwt match {
+    case JsonWebToken(_, claims, _) => claims.asSimpleMap.getOrElse(Map.empty[String, String])
   }
 
-  private def isTokenExpired(jwt: String) = getClaims(jwt) match {
-    case Some(claims) =>
-      claims.get("expiredAt") match {
-        case Some(value) => value.toLong < System.currentTimeMillis()
-        case None        => false
-      }
-    case None => false
-  }
+  private def isTokenExpired(jwt: String): Boolean =
+    getClaims(jwt).get("expiredAt").exists(_.toLong < System.currentTimeMillis())
 
   def routes: Route = login ~ securedContent
 
@@ -105,7 +99,7 @@ final class HttpApi(host: String, port: Int) extends Actor with ActorLogging {
   import HttpApi._
   import context.dispatcher
 
-  private implicit val materializer = ActorMaterializer()
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   Http(context.system).bindAndHandle(routes, host, port).pipeTo(self)
 

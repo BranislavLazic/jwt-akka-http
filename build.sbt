@@ -25,10 +25,10 @@ lazy val `jwt-akka-http` =
 lazy val library =
   new {
     object Version {
-      val akkaHttp       = "10.0.9"
-      val akkaHttpCirce  = "1.17.0"
+      val akkaHttp       = "10.1.7"
+      val akkaHttpCirce  = "1.23.0"
       val authenticatJwt = "0.4.5"
-      val circeGeneric   = "0.8.0"
+      val circeGeneric   = "0.10.0"
       val scalaCheck     = "1.13.5"
       val scalaTest      = "3.0.3"
     }
