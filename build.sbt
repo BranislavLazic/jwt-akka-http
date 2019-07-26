@@ -5,13 +5,13 @@
 lazy val `jwt-akka-http` =
   project
     .in(file("."))
-    .enablePlugins(AutomateHeaderPlugin, GitVersioning, GitBranchPrompt)
+    .enablePlugins(AutomateHeaderPlugin)
     .settings(settings)
     .settings(
       libraryDependencies ++= Seq(
         library.akkaHttp,
         library.akkaHttpCirce,
-        library.authenticatJwt,
+        library.authentikatJwt,
         library.circeGeneric,
         library.scalaCheck % Test,
         library.scalaTest  % Test
@@ -25,16 +25,16 @@ lazy val `jwt-akka-http` =
 lazy val library =
   new {
     object Version {
-      val akkaHttp       = "10.1.7"
-      val akkaHttpCirce  = "1.23.0"
-      val authenticatJwt = "0.4.5"
-      val circeGeneric   = "0.10.0"
-      val scalaCheck     = "1.13.5"
-      val scalaTest      = "3.0.3"
+      val akkaHttp       = "10.1.9"
+      val akkaHttpCirce  = "1.27.0"
+      val authentikatJwt = "0.4.5"
+      val circeGeneric   = "0.11.1"
+      val scalaCheck     = "1.14.0"
+      val scalaTest      = "3.0.8"
     }
     val akkaHttp       = "com.typesafe.akka" %% "akka-http"           % Version.akkaHttp
     val akkaHttpCirce  = "de.heikoseeberger" %% "akka-http-circe"     % Version.akkaHttpCirce
-    val authenticatJwt = "com.jason-goodwin" %% "authentikat-jwt"     % Version.authenticatJwt
+    val authentikatJwt = "com.jason-goodwin" %% "authentikat-jwt"     % Version.authentikatJwt
     val circeGeneric   = "io.circe"          %% "circe-generic"       % Version.circeGeneric
     val scalaCheck     = "org.scalacheck"    %% "scalacheck"          % Version.scalaCheck
     val scalaTest      = "org.scalatest"     %% "scalatest"           % Version.scalaTest
@@ -46,7 +46,7 @@ lazy val library =
 
 lazy val settings =
   commonSettings ++
-  gitSettings
+  scalafmtSettings
 
 lazy val commonSettings =
   Seq(
@@ -67,7 +67,7 @@ lazy val commonSettings =
     unmanagedSourceDirectories.in(Test) := Seq(scalaSource.in(Test).value)
 )
 
-lazy val gitSettings =
+lazy val scalafmtSettings =
   Seq(
-    git.useGitDescribe := true
+    scalafmtOnCompile := true,
   )
