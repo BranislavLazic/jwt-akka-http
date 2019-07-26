@@ -13,8 +13,10 @@ lazy val `jwt-akka-http` =
         library.akkaHttpCirce,
         library.authentikatJwt,
         library.circeGeneric,
-        library.scalaCheck % Test,
-        library.scalaTest  % Test
+        library.akkaTestkit  % Test,
+        library.akkaHttpTest % Test,
+        library.scalaCheck   % Test,
+        library.scalaTest    % Test
       )
     )
 
@@ -25,6 +27,7 @@ lazy val `jwt-akka-http` =
 lazy val library =
   new {
     object Version {
+      val akka           = "2.5.23"
       val akkaHttp       = "10.1.9"
       val akkaHttpCirce  = "1.27.0"
       val authentikatJwt = "0.4.5"
@@ -36,6 +39,9 @@ lazy val library =
     val akkaHttpCirce  = "de.heikoseeberger" %% "akka-http-circe"     % Version.akkaHttpCirce
     val authentikatJwt = "com.jason-goodwin" %% "authentikat-jwt"     % Version.authentikatJwt
     val circeGeneric   = "io.circe"          %% "circe-generic"       % Version.circeGeneric
+    // Testing libs
+    val akkaHttpTest   = "com.typesafe.akka" %% "akka-http-testkit"   % Version.akkaHttp
+    val akkaTestkit    = "com.typesafe.akka" %% "akka-testkit"        % Version.akka
     val scalaCheck     = "org.scalacheck"    %% "scalacheck"          % Version.scalaCheck
     val scalaTest      = "org.scalatest"     %% "scalatest"           % Version.scalaTest
   }

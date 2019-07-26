@@ -40,7 +40,8 @@ object HttpApi {
   import io.circe.generic.auto._
   import authentikat.jwt._
 
-  final val Name = "http-api"
+  final val Name                  = "http-api"
+  final val AccessTokenHeaderName = "X-Access-Token"
 
   final case class LoginRequest(username: String, password: String)
 
@@ -52,7 +53,7 @@ object HttpApi {
     entity(as[LoginRequest]) {
       case lr @ LoginRequest("admin", "admin") =>
         val claims = setClaims(lr.username, tokenExpiryPeriodInDays)
-        respondWithHeader(RawHeader("X-Access-Token", JsonWebToken(header, claims, secretKey))) {
+        respondWithHeader(RawHeader(AccessTokenHeaderName, JsonWebToken(header, claims, secretKey))) {
           complete(StatusCodes.OK)
         }
       case LoginRequest(_, _) => complete(StatusCodes.Unauthorized)
